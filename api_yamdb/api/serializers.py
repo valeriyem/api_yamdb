@@ -5,7 +5,7 @@ from django.conf import settings
 from rest_framework.validators import UniqueValidator
 
 from users.models import User
-
+from reviews.models import Title
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Сериализует запросы на регистрацию."""
@@ -115,3 +115,20 @@ class UserEditSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
         model = User
         read_only_fields = ('role',)
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    """Сериализация модели произведений."""
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Title
+        fields = [
+            'id',
+            'name',
+            'year',
+            'description',
+            'category',
+            'genre',
+        ]

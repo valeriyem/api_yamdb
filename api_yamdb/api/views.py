@@ -7,8 +7,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.viewsets import ModelViewSet
 from django.conf import settings
 from django.core.mail import send_mail
+from django_filters.rest_framework import DjangoFilterBackend
+from reviews.models import Title
+from .filters import TitleFilter
+from .serializers import TitleSerializer
+
 
 from api.serializers import (
     RegistrationSerializer,
@@ -90,3 +96,12 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
+class TitleViewSet(ModelViewSet):
+    """Вьюсет для обработки произведений."""
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_class = TitleFilter
