@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from rest_framework import permissions, status, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.decorators import permission_classes
@@ -14,6 +15,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from reviews.models import Title
 from .filters import TitleFilter
 from .serializers import TitleSerializer
+
 
 
 from api.serializers import (
@@ -100,8 +102,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class TitleViewSet(ModelViewSet):
     """Вьюсет для обработки произведений."""
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, ]
     filterset_class = TitleFilter
+
+
+
+

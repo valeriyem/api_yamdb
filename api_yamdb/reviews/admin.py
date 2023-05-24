@@ -15,3 +15,4 @@ class TitleAdmin(admin.ModelAdmin):
     search_fields = ['name', ]
     list_filter = ['category', ]
     empty_value_display = '-пусто-'
+
