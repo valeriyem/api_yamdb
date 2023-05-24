@@ -1,11 +1,34 @@
 from rest_framework import serializers
+from reviews.models import Comment, Review
 from django.db import IntegrityError
 from rest_framework.validators import UniqueValidator
 from django.conf import settings
-from rest_framework.validators import UniqueValidator
+
 
 from users.models import User
 from reviews.models import Title
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+        read_only_fields = ('title',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username'
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+        read_only_fields = ('comment',)
+
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Сериализует запросы на регистрацию."""
