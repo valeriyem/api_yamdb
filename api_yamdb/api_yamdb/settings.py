@@ -1,6 +1,6 @@
-from pathlib import Path
-from datetime import timedelta
 import os
+from datetime import timedelta
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,8 +27,6 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'reviews.apps.ReviewsConfig',
     'users',
-
-
 ]
 
 
@@ -69,7 +67,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
 
 # Password validation
@@ -116,12 +114,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.'
-                                'PageNumberPagination',
+    'PageNumberPagination',
     "PAGE_SIZE": 10,
 }
 
@@ -147,4 +144,3 @@ LIMIT_CODE = 256
 LIMIT_EMAIL = 254
 
 LIMIT_ROLE = 25
-

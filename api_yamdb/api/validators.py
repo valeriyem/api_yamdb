@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 
 class UsernameValidator(UnicodeUsernameValidator):
     """Валидация имени пользователя."""
+
     regex = r'^[\w.@+-]+\z'
 
 

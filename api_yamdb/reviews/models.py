@@ -5,6 +5,7 @@ from .validators import year_validator
 
 class Title(models.Model):
     """Модель для создания произведений."""
+
     name = models.CharField(
         max_length=256,
         verbose_name='Название',

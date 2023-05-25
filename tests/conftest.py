@@ -9,9 +9,8 @@ sys.path.append(BASE_DIR)
 root_dir_content = os.listdir(BASE_DIR)
 PROJECT_DIR_NAME = 'api_yamdb'
 
-if (
-        PROJECT_DIR_NAME not in root_dir_content
-        or not os.path.isdir(os.path.join(BASE_DIR, PROJECT_DIR_NAME))
+if PROJECT_DIR_NAME not in root_dir_content or not os.path.isdir(
+    os.path.join(BASE_DIR, PROJECT_DIR_NAME)
 ):
     assert False, (
         f'В директории `{BASE_DIR}` не найдена папка c проектом '

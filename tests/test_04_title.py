@@ -8,7 +8,6 @@ from tests.utils import (check_pagination, check_permissions,
 
 @pytest.mark.django_db(transaction=True)
 class Test04TitleAPI:
-
     def test_01_title_not_auth(self, client):
         response = client.get('/api/v1/titles/')
         assert response.status_code != HTTPStatus.NOT_FOUND, (
@@ -40,7 +39,7 @@ class Test04TitleAPI:
             'year': 'дветыщи',
             'genre': [genres[1]['slug']],
             'category': categories[1]['slug'],
-            'description': 'Угонял машины всю ночь и немного подустал.'
+            'description': 'Угонял машины всю ночь и немного подустал.',
         }
         response = admin_client.post(url, data=invalid_data)
         assert response.status_code == HTTPStatus.BAD_REQUEST, assert_msg
@@ -50,7 +49,7 @@ class Test04TitleAPI:
             'year': 1957,
             'genre': [genres[0]['slug'], genres[1]['slug']],
             'category': categories[0]['slug'],
-            'description': 'Рон Свонсон рекомендует.'
+            'description': 'Рон Свонсон рекомендует.',
         }
         response = admin_client.post(url, data=post_data_1)
         assert response.status_code == HTTPStatus.CREATED, (
@@ -65,7 +64,7 @@ class Test04TitleAPI:
             'year': 1966,
             'genre': [genres[2]['slug']],
             'category': categories[1]['slug'],
-            'description': 'Угадай ревьюера по названию фильма.'
+            'description': 'Угадай ревьюера по названию фильма.',
         }
         response = admin_client.post(url, data=post_data_2)
         assert response.status_code == HTTPStatus.CREATED, (
@@ -145,7 +144,7 @@ class Test04TitleAPI:
             'year': 1997,
             'genre': [genres[1]['slug']],
             'category': categories[1]['slug'],
-            'description': 'Дверь выдержала бы и двоих...'
+            'description': 'Дверь выдержала бы и двоих...',
         }
         admin_client.post(url, data=data)
 
@@ -209,7 +208,7 @@ class Test04TitleAPI:
 
         update_data = {
             'name': 'Новое название',
-            'category': categories[1]['slug']
+            'category': categories[1]['slug'],
         }
         response = admin_client.patch(
             f'/api/v1/titles/{titles[0]["id"]}/', data=update_data
@@ -260,7 +259,7 @@ class Test04TitleAPI:
             'year': 1989,
             'genre': [genres[0]['slug'], genres[1]['slug']],
             'category': categories[0]['slug'],
-            'description': 'Dragon Ball Z'
+            'description': 'Dragon Ball Z',
         }
         response = admin_client.post(url, data=data)
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
@@ -274,7 +273,7 @@ class Test04TitleAPI:
             'year': 1957,
             'genre': [genres[0]['slug'], genres[1]['slug']],
             'category': categories[0]['slug'],
-            'description': 'Рон Свонсон рекомендует.'
+            'description': 'Рон Свонсон рекомендует.',
         }
         response = admin_client.post(url, data=data)
         assert response.status_code == HTTPStatus.CREATED, (
@@ -288,17 +287,18 @@ class Test04TitleAPI:
             'содержит `id` созданного произведения.'
         )
 
-        response = admin_client.patch(f'{url}{idx}/', data={
-            'name': ('longname' + 'e' * 249)
-        })
+        response = admin_client.patch(
+            f'{url}{idx}/', data={'name': ('longname' + 'e' * 249)}
+        )
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
             'Проверьте, что при обработке PATCH-запрос администратора к '
             f'`{url}` проверяется длина поля `name`: название произведения не '
             'может быть длиннее 256 символов.'
         )
 
-    def test_05_titles_check_permission(self, client, user_client,
-                                        moderator_client, admin_client):
+    def test_05_titles_check_permission(
+        self, client, user_client, moderator_client, admin_client
+    ):
         titles, categories, genres = create_titles(admin_client)
         url = '/api/v1/titles/'
         data = {
@@ -306,13 +306,29 @@ class Test04TitleAPI:
             'year': 1981,
             'genre': [genres[2]['slug'], genres[1]['slug']],
             'category': categories[0]['slug'],
-            'description': 'This Is My Boomstick! - Ash'
+            'description': 'This Is My Boomstick! - Ash',
         }
-        check_permissions(client, url, data,
-                          'неавторизованного пользователя', titles,
-                          HTTPStatus.UNAUTHORIZED)
-        check_permissions(user_client, url, data,
-                          'пользователя с ролью `user`', titles,
-                          HTTPStatus.FORBIDDEN)
-        check_permissions(moderator_client, url, data, 'модератора',
-                          titles, HTTPStatus.FORBIDDEN)
+        check_permissions(
+            client,
+            url,
+            data,
+            'неавторизованного пользователя',
+            titles,
+            HTTPStatus.UNAUTHORIZED,
+        )
+        check_permissions(
+            user_client,
+            url,
+            data,
+            'пользователя с ролью `user`',
+            titles,
+            HTTPStatus.FORBIDDEN,
+        )
+        check_permissions(
+            moderator_client,
+            url,
+            data,
+            'модератора',
+            titles,
+            HTTPStatus.FORBIDDEN,
+        )
