@@ -2,7 +2,89 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import UniqueConstraint
 
+from .validators import year_validator
+
+class Title(models.Model):
+    """Модель для создания произведений."""
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название',
+    )
+    year = models.SmallIntegerField(
+        validators=[year_validator],
+        verbose_name='Год выпуска',
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Описание',
+    )
+    category = models.ForeignKey(
+        'Category',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='titles',
+        verbose_name='Категория',
+    )
+    genre = models.ManyToManyField(
+        'Genre',
+        db_index=True,
+        blank=True,
+        verbose_name='Жанр',
+    )
+
+    class Meta:
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
+
+    def __str__(self):
+        return self.name[:30]
+
+
+class Category(models.Model):
+    """Модель для создания категорий к произведениям."""
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название',
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        verbose_name='Слаг',
+    )
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.name[:30]
+
+
+class Genre(models.Model):
+    """Модель для создания жанров к произведениям."""
+    name = models.CharField(
+        max_length=256,
+        verbose_name='Название',
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        verbose_name='Слаг',
+    )
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name[:30]
+      
+
 class Review(models.Model):
+    """Модель для создания отзывов."""
+    
     text = models.TextField(verbose_name='текст')
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
@@ -40,8 +122,9 @@ class Review(models.Model):
         return self.text
 
 
-
 class Comment(models.Model):
+    """Модель для создания комментариев."""
+    
     author = models.ForeignKey(User,
                                on_delete=models.CASCADE,
                                related_name='comments',

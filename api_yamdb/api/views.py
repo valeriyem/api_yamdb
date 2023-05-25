@@ -1,11 +1,49 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination
 from rest_framework import filters, permissions, viewsets
+from rest_framework.viewsets import ModelViewSet
 
-from reviews.models import Comment, Review, Title
+from reviews.models import Title, Category, Genre Comment, Review
+from .filters import TitleFilter
 
 from .permissions import IsAuthorIsModeratorIsAdminIsSuperUser
-from .serializers import (ReviewSerializer, CommentSerializer)
+from .serializers import (TitleSerializer, CategorySerializer, GenreSerializer, ReviewSerializer, CommentSerializer)
 
+
+class TitleViewSet(ModelViewSet):
+    """Вьюсет для обработки произведений."""
+    #queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+      rating=Avg('reviews__score')
+    )
+    serializer_class = TitleSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_class = TitleFilter
+
+
+class CategoryViewSet(ModelViewSet):
+    """Вьюсет для обработки категорий для произведений."""
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter, ]
+    search_fields = ['name', ]
+    lookup_field = 'slug'
+    http_method_names = ['get', 'post', 'delete', ]
+
+
+class GenreViewSet(ModelViewSet):
+    """Вьюсет для обработки жанров для произведений."""
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = PageNumberPagination
+    filter_backends = [filters.SearchFilter, ]
+    search_fields = ['name', ]
+    lookup_field = 'slug'
+    http_method_names = ['get', 'post', 'delete', ]
+    
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Вьюсет для объектов модели Review"""
@@ -26,7 +64,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
         serializer.save(title=title, author=self.request.user)
 
 
-
 class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет для объектов модели Comment."""
     serializer_class = CommentSerializer
@@ -43,6 +80,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get("review_id")
         review = get_object_or_404(Review, pk=review_id)
         serializer.save(review=review, author=self.request.user)
-
-
-
