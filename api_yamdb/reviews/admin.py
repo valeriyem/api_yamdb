@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Title, Category, Genre
+from .models import Title, Category, Genre, GenreTitle
 
 
 @admin.register(Title)
@@ -40,4 +40,15 @@ class GenreAdmin(admin.ModelAdmin):
         'slug',
     ]
     search_fields = ['name', ]
+    empty_value_display = '-пусто-'
+
+
+@admin.register(GenreTitle)
+class GenreTitleAdmin(admin.ModelAdmin):
+    """Отвечает за отображение модели GenreTitle."""
+    list_display = [
+        'title',
+        'genre',
+    ]
+    search_fields = ['title', ]
     empty_value_display = '-пусто-'

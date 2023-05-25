@@ -25,7 +25,7 @@ from api.serializers import (
     RegistrationSerializer,
     TokenSerializer,
     UserEditSerializer,
-    UserSerializer
+    UserSerializer, ReadOnlyTitleSerializer
 )
 
 # Импорты для работы с произведениями
@@ -114,40 +114,40 @@ class UserViewSet(ModelViewSet):
 
 class TitleViewSet(ModelViewSet):
     """Вьюсет для обработки произведений."""
-    permission_classes = [IsAdminOrReadOnly]
-    queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')
-    )
+    queryset = Title.objects.all().annotate(
+        Avg('reviews__score')
+    ).order_by('name')
     serializer_class = TitleSerializer
-    pagination_class = PageNumberPagination
-    filter_backends = [
-        DjangoFilterBackend,
-    ]
+    permission_classes = [IsAdminOrReadOnly, ]
+    filter_backends = [DjangoFilterBackend]
     filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('retrieve', 'list'):
+            return ReadOnlyTitleSerializer
+        return TitleSerializer
 
 
 class CategoryViewSet(DestroyCreateListMixins):
     """Вьюсет для обработки категорий для произведений."""
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly, ]
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter, ]
     search_fields = ['name', ]
     lookup_field = 'slug'
-    http_method_names = ['get', 'post', 'delete', ]
+    pagination_class = PageNumberPagination
 
 
 class GenreViewSet(DestroyCreateListMixins):
     """Вьюсет для обработки жанров для произведений."""
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly, ]
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = PageNumberPagination
     filter_backends = [filters.SearchFilter, ]
     search_fields = ['name', ]
     lookup_field = 'slug'
-    http_method_names = ['get', 'post', 'delete', ]
+    pagination_class = PageNumberPagination
 
 
 class ReviewViewSet(ModelViewSet):
