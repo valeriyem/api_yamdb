@@ -9,13 +9,20 @@ from tests.utils import (check_fields, check_pagination, create_reviews,
 
 @pytest.mark.django_db(transaction=True)
 class Test05ReviewAPI:
-
-    def test_01_review_not_auth(self, client, admin_client, admin, user_client,
-                                user, moderator_client, moderator):
+    def test_01_review_not_auth(
+        self,
+        client,
+        admin_client,
+        admin,
+        user_client,
+        user,
+        moderator_client,
+        moderator,
+    ):
         author_map = {
             admin: admin_client,
             user: user_client,
-            moderator: moderator_client
+            moderator: moderator_client,
         }
         reviews, titles = create_reviews(admin_client, author_map)
         new_data = {'text': 'new_text', 'score': 7}
@@ -42,7 +49,7 @@ class Test05ReviewAPI:
 
         response = client.patch(
             f'/api/v1/titles/{titles[0]["id"]}/reviews/{reviews[1]["id"]}/',
-            data=new_data
+            data=new_data,
         )
         assert response.status_code == HTTPStatus.UNAUTHORIZED, (
             'Проверьте, что PATCH-запрос неавторизованного пользователя к '
@@ -59,8 +66,9 @@ class Test05ReviewAPI:
             'ответ со статусом 401.'
         )
 
-    def test_02_review_post(self, admin_client, user_client,
-                            moderator_client, admin):
+    def test_02_review_post(
+        self, admin_client, user_client, moderator_client, admin
+    ):
         titles, _, _ = create_titles(admin_client)
         title_0_reviews_count = 0
 
@@ -74,22 +82,16 @@ class Test05ReviewAPI:
             'данные - должен вернуться ответ со статусом 400.'
         )
 
-        post_data = {
-            'text': 'Неочень',
-            'score': 5
-        }
+        post_data = {'text': 'Неочень', 'score': 5}
         create_single_review(
             admin_client,
             titles[0]["id"],
             post_data['text'],
-            post_data['score']
+            post_data['score'],
         )
         title_0_reviews_count += 1
 
-        data = {
-            'text': 'Шляпа',
-            'score': 1
-        }
+        data = {'text': 'Шляпа', 'score': 1}
         response = admin_client.post(
             f'/api/v1/titles/{titles[0]["id"]}/reviews/', data=data
         )
@@ -114,7 +116,7 @@ class Test05ReviewAPI:
                 text='Текст второго отзыва',
                 score='5',
                 author=admin,
-                title=title
+                title=title,
             )
         except IntegrityError:
             pass
@@ -191,7 +193,7 @@ class Test05ReviewAPI:
         expected_data = {
             'text': post_data['text'],
             'score': post_data['score'],
-            'author': admin.username
+            'author': admin.username,
         }
         review = None
         for value in data['results']:
@@ -203,8 +205,10 @@ class Test05ReviewAPI:
             'об отзывах. В ответе на запрос не обнаружен текст отзыва.'
         )
         check_fields(
-            'review', '/api/v1/titles/{title_id}/reviews/',
-            review, expected_data
+            'review',
+            '/api/v1/titles/{title_id}/reviews/',
+            review,
+            expected_data,
         )
 
         response = admin_client.get(f'/api/v1/titles/{titles[0]["id"]}/')
@@ -217,12 +221,20 @@ class Test05ReviewAPI:
             'значение.'
         )
 
-    def test_03_review_detail_get(self, client, admin_client, admin, user,
-                                  user_client, moderator, moderator_client):
+    def test_03_review_detail_get(
+        self,
+        client,
+        admin_client,
+        admin,
+        user,
+        user_client,
+        moderator,
+        moderator_client,
+    ):
         author_map = {
             admin: admin_client,
             user: user_client,
-            moderator: moderator_client
+            moderator: moderator_client,
         }
         reviews, titles = create_reviews(admin_client, author_map)
         url_template = '/api/v1/titles/{title_id}/reviews/{review_id}/'
@@ -247,22 +259,26 @@ class Test05ReviewAPI:
             'review', url_template, review, expected_data, detail=True
         )
 
-    def test_04_review_detail_user(self, admin_client, admin, user,
-                                   user_client, moderator, moderator_client):
+    def test_04_review_detail_user(
+        self,
+        admin_client,
+        admin,
+        user,
+        user_client,
+        moderator,
+        moderator_client,
+    ):
         author_map = {
             admin: admin_client,
             user: user_client,
-            moderator: moderator_client
+            moderator: moderator_client,
         }
         reviews, titles = create_reviews(admin_client, author_map)
         url_template = '/api/v1/titles/{title_id}/reviews/{review_id}/'
-        new_data = {
-            'text': 'Top score',
-            'score': 10
-        }
+        new_data = {'text': 'Top score', 'score': 10}
         response = user_client.patch(
             f'/api/v1/titles/{titles[0]["id"]}/reviews/{reviews[1]["id"]}/',
-            data=new_data
+            data=new_data,
         )
         assert response.status_code == HTTPStatus.OK, (
             'Проверьте, что PATCH-запрос пользователя с ролью `user` к '
@@ -289,20 +305,16 @@ class Test05ReviewAPI:
             'к его собственному отзыву через `{url_template}` содержится поле '
             '`{field}` - то это поле отзыва будет изменено.'
         )
-        assert data.get('text') == new_data['text'], (
-            assert_msg_template.format(
-                url_template=url_template, field='text'
-            )
-        )
-        assert data.get('score') == new_data['score'], (
-            assert_msg_template.format(
-                url_template=url_template, field='score'
-            )
-        )
+        assert (
+            data.get('text') == new_data['text']
+        ), assert_msg_template.format(url_template=url_template, field='text')
+        assert (
+            data.get('score') == new_data['score']
+        ), assert_msg_template.format(url_template=url_template, field='score')
 
         response = user_client.patch(
             f'/api/v1/titles/{titles[0]["id"]}/reviews/{reviews[2]["id"]}/',
-            data=new_data
+            data=new_data,
         )
         assert response.status_code == HTTPStatus.FORBIDDEN, (
             'Проверьте, что PATCH-запрос пользователя с ролью `user` к '
@@ -336,31 +348,36 @@ class Test05ReviewAPI:
             'статусом 403.'
         )
 
-    def test_05_reviews_detail_moderator_and_admin(self, admin_client, admin,
-                                                   user_client, user,
-                                                   moderator_client,
-                                                   moderator):
+    def test_05_reviews_detail_moderator_and_admin(
+        self,
+        admin_client,
+        admin,
+        user_client,
+        user,
+        moderator_client,
+        moderator,
+    ):
         author_map = {
             admin: admin_client,
             user: user_client,
-            moderator: moderator_client
+            moderator: moderator_client,
         }
         url_template = '/api/v1/titles/{title_id}/reviews/{review_id}/'
         reviews, titles = create_reviews(admin_client, author_map)
-        new_data = {
-            'text': 'Top score',
-            'score': 10
-        }
+        new_data = {'text': 'Top score', 'score': 10}
 
-        for idx, (client, role) in enumerate((
+        for idx, (client, role) in enumerate(
+            (
                 (moderator_client, 'модератора'),
-                (admin_client, 'администратора')
-        ), 1):
+                (admin_client, 'администратора'),
+            ),
+            1,
+        ):
             response = client.patch(
                 url_template.format(
                     title_id=titles[0]["id"], review_id=reviews[idx]["id"]
                 ),
-                data=new_data
+                data=new_data,
             )
             assert response.status_code == HTTPStatus.OK, (
                 f'Проверьте, что PATCH-запросе {role} к  чужому отзыву через '
@@ -376,9 +393,7 @@ class Test05ReviewAPI:
                 f'Проверьте, что DELETE-запрос {role} к чужому отзыву через '
                 f'`{url_template}` возвращает ответ со статусом 204.'
             )
-            response = client.get(
-                f'/api/v1/titles/{titles[0]["id"]}/reviews/'
-            )
+            response = client.get(f'/api/v1/titles/{titles[0]["id"]}/reviews/')
             test_data = response.json()['results']
             assert len(test_data) == len(reviews) - idx, (
                 f'Проверьте, что DELETE-запрос {role} к чужому отзыву через '

@@ -8,28 +8,24 @@ from tests.utils import (check_pagination,
 
 @pytest.mark.django_db(transaction=True)
 class Test01UserAPI:
-
     VALID_DATA_FOR_USER_CREATION = [
         (
             {
                 'username': 'TestUser_2',
                 'role': 'user',
-                'email': 'testuser2@yamdb.fake'
+                'email': 'testuser2@yamdb.fake',
             },
-            ''
+            '',
         ),
         (
-            {
-                'username': 'TestUser_3',
-                'email': 'testuser3@yamdb.fake'
-            },
-            'без указания роли нового пользователя '
-        )
+            {'username': 'TestUser_3', 'email': 'testuser3@yamdb.fake'},
+            'без указания роли нового пользователя ',
+        ),
     ]
     PATCH_DATA = {
         'first_name': 'New User Firstname',
         'last_name': 'New User Lastname',
-        'bio': 'new user bio'
+        'bio': 'new user bio',
     }
 
     def test_01_users_not_authenticated(self, client):
@@ -88,12 +84,13 @@ class Test01UserAPI:
             'first_name': admin.first_name,
             'last_name': admin.last_name,
             'bio': admin.bio,
-            'role': admin.role
+            'role': admin.role,
         }
         check_pagination('/api/v1/users/', data, 1, admin_data)
 
-    def test_04_02_users_get_search(self, user, admin_client,
-                                    admin, django_user_model):
+    def test_04_02_users_get_search(
+        self, user, admin_client, admin, django_user_model
+    ):
         url = '/api/v1/users/'
         search_url = f'{url}?search={admin.username}'
         response = admin_client.get(search_url)
@@ -102,15 +99,16 @@ class Test01UserAPI:
             'Проверьте настройки в *urls.py*.'
         )
         reponse_json = response.json()
-        assert ('results' in reponse_json
-                and isinstance(reponse_json.get('results'), list)), (
+        assert 'results' in reponse_json and isinstance(
+            reponse_json.get('results'), list
+        ), (
             'Проверьте, что GET-запрос к `/api/v1/users/?search={username}` '
             'возвращает результаты поиска по значению ключа `results` в виде '
             'списка.'
         )
-        users_count = (
-            django_user_model.objects.filter(username=admin.username).count()
-        )
+        users_count = django_user_model.objects.filter(
+            username=admin.username
+        ).count()
         assert len(reponse_json['results']) == users_count, (
             'Проверьте, что GET-запрос к `/api/v1/users/?search={username}` '
             'возвращает данные только тех пользователей, `username` которых '
@@ -122,7 +120,7 @@ class Test01UserAPI:
             'role': admin.role,
             'first_name': admin.first_name,
             'last_name': admin.last_name,
-            'bio': admin.bio
+            'bio': admin.bio,
         }
         assert reponse_json['results'] == [admin_as_dict], (
             'Проверьте, что ответ на GET-запрос к '
@@ -154,20 +152,14 @@ class Test01UserAPI:
             'статусом 400.'
         )
 
-        no_email_data = {
-            'username': 'TestUser_noemail',
-            'role': 'user'
-        }
+        no_email_data = {'username': 'TestUser_noemail', 'role': 'user'}
         response = admin_client.post('/api/v1/users/', data=no_email_data)
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
             'Если POST-запрос администратора к `/api/v1/users/` '
             'не содержит `email` - должен вернуться ответ со статусом 400.'
         )
 
-        no_username_data = {
-            'email': 'valid_email@yamdb.fake',
-            'role': 'user'
-        }
+        no_username_data = {'email': 'valid_email@yamdb.fake', 'role': 'user'}
         response = admin_client.post('/api/v1/users/', data=no_username_data)
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
             'Если POST-запрос администратора к `/api/v1/users/` '
@@ -177,7 +169,7 @@ class Test01UserAPI:
         duplicate_email = {
             'username': 'TestUser_duplicate',
             'role': 'user',
-            'email': admin.email
+            'email': admin.email,
         }
         response = admin_client.post('/api/v1/users/', data=duplicate_email)
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
@@ -189,7 +181,7 @@ class Test01UserAPI:
         duplicate_username = {
             'username': admin.username,
             'role': 'user',
-            'email': 'valid_test_email@yamdb.fake'
+            'email': 'valid_test_email@yamdb.fake',
         }
         response = admin_client.post('/api/v1/users/', data=duplicate_username)
         assert response.status_code == HTTPStatus.BAD_REQUEST, (
@@ -199,9 +191,9 @@ class Test01UserAPI:
         )
 
     @pytest.mark.parametrize('data,msg_modifier', VALID_DATA_FOR_USER_CREATION)
-    def test_05_02_users_post_admin_user_creation(self, admin_client,
-                                                  data, msg_modifier,
-                                                  django_user_model):
+    def test_05_02_users_post_admin_user_creation(
+        self, admin_client, data, msg_modifier, django_user_model
+    ):
         response = admin_client.post('/api/v1/users/', data=data)
         assert response.status_code == HTTPStatus.CREATED, (
             'Если POST-запрос администратора к `/api/v1/users/` содержит '
@@ -228,7 +220,7 @@ class Test01UserAPI:
             'username': 'test_username',
             'bio': 'test bio',
             'role': 'moderator',
-            'email': 'testmoder2@yamdb.fake'
+            'email': 'testmoder2@yamdb.fake',
         }
         response = admin_client.post('/api/v1/users/', data=data)
         assert response.status_code == HTTPStatus.CREATED, (
@@ -238,7 +230,12 @@ class Test01UserAPI:
         )
         response_data = response.json()
         expected_keys = (
-            'first_name', 'last_name', 'username', 'bio', 'role', 'email'
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'role',
+            'email',
         )
         for key in expected_keys:
             assert response_data.get(key) == data[key], (
@@ -248,12 +245,13 @@ class Test01UserAPI:
                 'некорректные данные.'
             )
 
-    def test_05_04_users_post_user_superuser(self, user_superuser_client,
-                                             django_user_model):
+    def test_05_04_users_post_user_superuser(
+        self, user_superuser_client, django_user_model
+    ):
         valid_data = {
             'username': 'TestUser_3',
             'role': 'user',
-            'email': 'testuser3@yamdb.fake'
+            'email': 'testuser3@yamdb.fake',
         }
         response = user_superuser_client.post(
             '/api/v1/users/', data=valid_data
@@ -263,8 +261,8 @@ class Test01UserAPI:
             'содержит корректные данные - должен вернуться ответ со статусом '
             '201.'
         )
-        users_after = (
-            django_user_model.objects.filter(email=valid_data['email'])
+        users_after = django_user_model.objects.filter(
+            email=valid_data['email']
         )
         assert users_after.exists(), (
             'Если POST-запрос суперпользователя к `/api/v1/users/` '
@@ -285,7 +283,12 @@ class Test01UserAPI:
 
         response_data = response.json()
         expected_keys = (
-            'first_name', 'last_name', 'username', 'bio', 'role', 'email'
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'role',
+            'email',
         )
         for key in expected_keys:
             assert response_data.get(key) == getattr(moderator, key), (
@@ -295,8 +298,9 @@ class Test01UserAPI:
                 'некорректные данные.'
             )
 
-    def test_06_users_username_get_not_admin(self, user_client,
-                                             moderator_client, admin):
+    def test_06_users_username_get_not_admin(
+        self, user_client, moderator_client, admin
+    ):
         for test_client in (user_client, moderator_client):
             response = test_client.get(f'/api/v1/users/{admin.username}/')
             assert response.status_code != HTTPStatus.NOT_FOUND, (
@@ -309,12 +313,13 @@ class Test01UserAPI:
                 'должен вернуть ответ со статусом 403.'
             )
 
-    def test_07_01_users_username_patch_admin(self, user, admin_client,
-                                              django_user_model):
+    def test_07_01_users_username_patch_admin(
+        self, user, admin_client, django_user_model
+    ):
         data = {
             'first_name': 'Admin',
             'last_name': 'Test',
-            'bio': 'description'
+            'bio': 'description',
         }
         response = admin_client.patch(
             f'/api/v1/users/{user.username}/', data=data
@@ -363,10 +368,9 @@ class Test01UserAPI:
                 'пользователя не удаляет этого пользователя.'
             )
 
-    def test_07_02_users_username_patch_moderator(self,
-                                                  moderator_client,
-                                                  user,
-                                                  django_user_model):
+    def test_07_02_users_username_patch_moderator(
+        self, moderator_client, user, django_user_model
+    ):
         response = moderator_client.patch(
             f'/api/v1/users/{user.username}/', data=self.PATCH_DATA
         )
@@ -376,13 +380,12 @@ class Test01UserAPI:
             'возвращает ответ со статусом 403.'
         )
 
-        user = (
-            django_user_model.objects.filter(username=user.username).first()
-        )
+        user = django_user_model.objects.filter(username=user.username).first()
         self.check_user_data_not_changed_with_patch(user, 'модератора')
 
-    def test_07_03_users_username_patch_user(self, user_client, user,
-                                             django_user_model):
+    def test_07_03_users_username_patch_user(
+        self, user_client, user, django_user_model
+    ):
         response = user_client.patch(
             f'/api/v1/users/{user.username}/', data=self.PATCH_DATA
         )
@@ -391,9 +394,7 @@ class Test01UserAPI:
             '`/api/v1/users/{username}/` возвращает ответ со статусом 403.'
         )
 
-        user = (
-            django_user_model.objects.filter(username=user.username).first()
-        )
+        user = django_user_model.objects.filter(username=user.username).first()
         self.check_user_data_not_changed_with_patch(
             user, 'пользователя с ролью `user`'
         )
@@ -407,8 +408,9 @@ class Test01UserAPI:
             'не предусмотрен и возвращает статус 405.'
         )
 
-    def test_08_01_users_username_delete_admin(self, user, admin_client,
-                                               django_user_model):
+    def test_08_01_users_username_delete_admin(
+        self, user, admin_client, django_user_model
+    ):
         users_cnt = django_user_model.objects.count()
         response = admin_client.delete(f'/api/v1/users/{user.username}/')
         assert response.status_code == HTTPStatus.NO_CONTENT, (
@@ -420,8 +422,9 @@ class Test01UserAPI:
             '`/api/v1/users/{username}/` удаляет пользователя.'
         )
 
-    def test_08_02_users_username_delete_moderator(self, moderator_client,
-                                                   user, django_user_model):
+    def test_08_02_users_username_delete_moderator(
+        self, moderator_client, user, django_user_model
+    ):
         users_cnt = django_user_model.objects.count()
         response = moderator_client.delete(f'/api/v1/users/{user.username}/')
         assert response.status_code == HTTPStatus.FORBIDDEN, (
@@ -433,8 +436,9 @@ class Test01UserAPI:
             '`/api/v1/users/{username}/` не удаляет пользователя.'
         )
 
-    def test_08_03_users_username_delete_user(self, user_client, user,
-                                              django_user_model):
+    def test_08_03_users_username_delete_user(
+        self, user_client, user, django_user_model
+    ):
         users_cnt = django_user_model.objects.count()
         response = user_client.delete(f'/api/v1/users/{user.username}/')
         assert response.status_code == HTTPStatus.FORBIDDEN, (
@@ -446,8 +450,9 @@ class Test01UserAPI:
             '`/api/v1/users/{username}/` не удаляет пользователя.'
         )
 
-    def test_08_04_users_username_delete_superuser(self, user_superuser_client,
-                                                   user, django_user_model):
+    def test_08_04_users_username_delete_superuser(
+        self, user_superuser_client, user, django_user_model
+    ):
         users_cnt = django_user_model.objects.count()
         response = user_superuser_client.delete(
             f'/api/v1/users/{user.username}/'
@@ -477,30 +482,36 @@ class Test01UserAPI:
                 f'`{key}` отсутствует либо содержит некорректные данные.'
             )
 
-    def test_09_02_users_me_delete_not_allowed(self, user_client, user,
-                                               django_user_model):
+    def test_09_02_users_me_delete_not_allowed(
+        self, user_client, user, django_user_model
+    ):
         response = user_client.delete('/api/v1/users/me/')
         assert response.status_code == HTTPStatus.METHOD_NOT_ALLOWED, (
             'Проверьте, что DELETE-запрос к `/api/v1/users/me/` возвращает '
             'ответ со статусом 405.'
         )
-        user = (
-            django_user_model.objects.filter(username=user.username).first()
-        )
+        user = django_user_model.objects.filter(username=user.username).first()
         assert user, (
             'Проверьте, что DELETE-запрос к `/api/v1/users/me/` не удаляет '
             'пользователя.'
         )
 
-    def test_10_01_users_me_patch(self, django_user_model, admin_client,
-                                  admin, moderator_client, moderator,
-                                  user_client, user):
+    def test_10_01_users_me_patch(
+        self,
+        django_user_model,
+        admin_client,
+        admin,
+        moderator_client,
+        moderator,
+        user_client,
+        user,
+    ):
         data = {'bio': 'description'}
 
         for client, user in (
-                (admin_client, admin),
-                (moderator_client, moderator),
-                (user_client, user)
+            (admin_client, admin),
+            (moderator_client, moderator),
+            (user_client, user),
         ):
             response = client.patch('/api/v1/users/me/', data=data)
             assert response.status_code == HTTPStatus.OK, (
@@ -518,19 +529,19 @@ class Test01UserAPI:
     @pytest.mark.parametrize(
         'data,messege', invalid_data_for_user_patch_and_creation
     )
-    def test_10_02_users_me_has_field_validation(self, user_client, data,
-                                                 messege):
+    def test_10_02_users_me_has_field_validation(
+        self, user_client, data, messege
+    ):
         url = '/api/v1/users/me/'
         request_method = 'PATCH'
         response = user_client.patch(url, data=data)
-        assert response.status_code == HTTPStatus.BAD_REQUEST, (
-            messege[0].format(url=url, request_method=request_method)
-        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST, messege[
+            0
+        ].format(url=url, request_method=request_method)
 
-    def test_10_03_users_me_patch_change_role_not_allowed(self,
-                                                          user_client,
-                                                          user,
-                                                          django_user_model):
+    def test_10_03_users_me_patch_change_role_not_allowed(
+        self, user_client, user, django_user_model
+    ):
         data = {
             'first_name': 'New user first name',
             'last_name': 'New user last name',
@@ -543,9 +554,7 @@ class Test01UserAPI:
         )
 
         current_role = user.role
-        data = {
-            'role': 'admin'
-        }
+        data = {'role': 'admin'}
         response = user_client.patch('/api/v1/users/me/', data=data)
         user = django_user_model.objects.filter(username=user.username).first()
         assert user.role == current_role, (

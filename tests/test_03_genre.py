@@ -8,7 +8,6 @@ from tests.utils import (check_name_and_slug_patterns, check_pagination,
 
 @pytest.mark.django_db(transaction=True)
 class Test03GenreAPI:
-
     def test_01_genre_not_auth(self, client):
         response = client.get('/api/v1/genres/')
         assert response.status_code != HTTPStatus.NOT_FOUND, (
@@ -77,9 +76,9 @@ class Test03GenreAPI:
     def test_03_category_fields_validation(self, data, massage, admin_client):
         url = '/api/v1/genres/'
         response = admin_client.post(url, data=data)
-        assert response.status_code == HTTPStatus.BAD_REQUEST, (
-            massage[0].format(url=url)
-        )
+        assert response.status_code == HTTPStatus.BAD_REQUEST, massage[
+            0
+        ].format(url=url)
 
     def test_04_genres_delete(self, admin_client):
         genres = create_genre(admin_client)
@@ -105,20 +104,33 @@ class Test03GenreAPI:
             '`/api/v1/genres/{slug}/` возвращает ответ со статусом 405.'
         )
 
-    def test_05_genres_check_permission(self, client,
-                                        user_client,
-                                        moderator_client,
-                                        admin_client):
+    def test_05_genres_check_permission(
+        self, client, user_client, moderator_client, admin_client
+    ):
         genres = create_genre(admin_client)
-        data = {
-            'name': 'Боевик',
-            'slug': 'action'
-        }
+        data = {'name': 'Боевик', 'slug': 'action'}
         url = '/api/v1/genres/'
-        check_permissions(client, url, data, 'неавторизованного пользователя',
-                          genres, HTTPStatus.UNAUTHORIZED)
-        check_permissions(user_client, url, data,
-                          'пользователя с ролью `user`', genres,
-                          HTTPStatus.FORBIDDEN)
-        check_permissions(moderator_client, url, data, 'модератора',
-                          genres, HTTPStatus.FORBIDDEN)
+        check_permissions(
+            client,
+            url,
+            data,
+            'неавторизованного пользователя',
+            genres,
+            HTTPStatus.UNAUTHORIZED,
+        )
+        check_permissions(
+            user_client,
+            url,
+            data,
+            'пользователя с ролью `user`',
+            genres,
+            HTTPStatus.FORBIDDEN,
+        )
+        check_permissions(
+            moderator_client,
+            url,
+            data,
+            'модератора',
+            genres,
+            HTTPStatus.FORBIDDEN,
+        )
