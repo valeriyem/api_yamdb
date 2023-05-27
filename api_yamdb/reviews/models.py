@@ -1,9 +1,10 @@
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.db.models import UniqueConstraint
 
-from .validators import year_validator
 from users.models import User
+
+from .validators import year_validator
 
 
 class Title(models.Model):
@@ -150,7 +151,6 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Модель для создания комментариев."""
-
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

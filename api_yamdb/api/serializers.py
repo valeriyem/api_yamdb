@@ -4,19 +4,12 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
-from reviews.models import (
-    Title,
-    Category,
-    Genre,
-    Comment,
-    Review
-)
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Сериализация запросов на регистрацию."""
-
     username = serializers.RegexField(
         max_length=settings.LIMIT_USERNAME,
         regex=r'^[\w.@+-]+\Z',
@@ -61,7 +54,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.Serializer):
     """Сериализация токена."""
-
     username = serializers.RegexField(
         max_length=settings.LIMIT_USERNAME,
         regex=r'^[\w.@+-]+\Z',
@@ -78,7 +70,6 @@ class TokenSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериалилзация данных пользователя."""
-
     username = serializers.RegexField(
         max_length=settings.LIMIT_USERNAME,
         regex=r'^[\w.@+-]+\Z',
@@ -141,7 +132,6 @@ class UserEditSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализация модели категорий к произведениям."""
-
     class Meta:
         model = Category
         fields = [
@@ -153,7 +143,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализация модели жанров к произведениям."""
-
     class Meta:
         model = Genre
         fields = [
@@ -204,7 +193,6 @@ class ReadOnlyTitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализация отзывов к произведениям."""
-
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
@@ -233,7 +221,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализация комментариев к отзывам."""
-
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )

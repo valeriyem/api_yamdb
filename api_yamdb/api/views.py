@@ -1,45 +1,31 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Avg
-
+from rest_framework import filters, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
-from rest_framework import filters, permissions, status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import AccessToken
 
+from api.serializers import (ReadOnlyTitleSerializer, RegistrationSerializer,
+                             TokenSerializer, UserEditSerializer,
+                             UserSerializer)
+from reviews.models import Category, Genre, Review, Title
 # Импорты для работы с Юзером
 from users.models import User
-from .permissions import (
-    IsAdminOrReadOnly,
-    IsStaffOrAuthorOrReadOnly,
-    IsAdminOrSuperUser,
-    IsAuthenticatedOrReadOnly
-)
-from api.serializers import (
-    RegistrationSerializer,
-    TokenSerializer,
-    UserEditSerializer,
-    UserSerializer, ReadOnlyTitleSerializer
-)
 
 # Импорты для работы с произведениями
 from .filters import TitleFilter
-from reviews.models import Title, Category, Genre, Review
 from .mixins import DestroyCreateListMixins
-
-from .serializers import (
-    TitleSerializer,
-    CategorySerializer,
-    GenreSerializer,
-    ReviewSerializer,
-    CommentSerializer
-)
+from .permissions import (IsAdminOrReadOnly, IsAdminOrSuperUser,
+                          IsAuthenticatedOrReadOnly, IsStaffOrAuthorOrReadOnly)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer, TitleSerializer)
 
 
 @api_view(['POST'])
@@ -80,7 +66,6 @@ def get_jwt_token(request):
 
 class UserViewSet(ModelViewSet):
     """Администратор получает список пользователей или создает нового."""
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
     filter_backends = (SearchFilter,)
