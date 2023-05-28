@@ -1,7 +1,7 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.conf import settings
 from api.validators import UsernameValidator, username_not_me
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
@@ -16,7 +16,8 @@ class User(AbstractUser):
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
         max_length=settings.LIMIT_EMAIL,
-        unique=True,)
+        unique=True,
+    )
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=settings.LIMIT_USERNAME,
@@ -24,22 +25,18 @@ class User(AbstractUser):
         unique=True,
         validators=[UsernameValidator(), username_not_me],
     )
-    first_name = models.CharField('Имя',
-                                  max_length=settings.LIMIT_USERNAME,
-                                  blank=True)
-    last_name = models.CharField('Фамилия',
-                                 max_length=settings.LIMIT_USERNAME,
-                                 blank=True)
-    bio = models.TextField(
-        verbose_name='О себе',
-        null=True,
-        blank=True
+    first_name = models.CharField(
+        'Имя', max_length=settings.LIMIT_USERNAME, blank=True,
     )
+    last_name = models.CharField(
+        'Фамилия', max_length=settings.LIMIT_USERNAME, blank=True,
+    )
+    bio = models.TextField(verbose_name='О себе', null=True, blank=True)
     role = models.CharField(
         verbose_name='Роль',
         max_length=settings.LIMIT_ROLE,
         choices=ROLES,
-        default=USER
+        default=USER,
     )
 
     @property

@@ -1,9 +1,9 @@
-from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.db.models import UniqueConstraint
+from users.models import User
 
 from .validators import year_validator
-from users.models import User
 
 
 class Title(models.Model):
@@ -46,13 +46,11 @@ class Title(models.Model):
 
 class GenreTitle(models.Model):
     title = models.ForeignKey(
-        'Title',
-        verbose_name='Произведение',
-        on_delete=models.CASCADE)
+        'Title', verbose_name='Произведение', on_delete=models.CASCADE,
+    )
     genre = models.ForeignKey(
-        'Genre',
-        verbose_name='Жанр',
-        on_delete=models.CASCADE)
+        'Genre', verbose_name='Жанр', on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return f'{self.title}, жанр - {self.genre}'
@@ -114,15 +112,10 @@ class Review(models.Model):
     score = models.PositiveIntegerField(
         verbose_name='оценка',
         validators=[
-            MinValueValidator(
-                1,
-                message='Введите оценку от 1 до 10'
-            ),
-            MaxValueValidator(
-                10,
-                message='Введите оценку от 1 до 10'
-            ),
-        ])
+            MinValueValidator(1, message='Введите оценку от 1 до 10'),
+            MaxValueValidator(10, message='Введите оценку от 1 до 10'),
+        ],
+    )
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
@@ -138,10 +131,7 @@ class Review(models.Model):
     class Meta:
         ordering = ('-pub_date',)
         constraints = (
-            UniqueConstraint(
-                fields=['author', 'title'],
-                name='unique_review'
-            ),
+            UniqueConstraint(fields=['author', 'title'], name='unique_review'),
         )
 
     def __str__(self):
@@ -150,7 +140,6 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Модель для создания комментариев."""
-
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
