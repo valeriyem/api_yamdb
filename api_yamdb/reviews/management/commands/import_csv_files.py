@@ -32,7 +32,7 @@ class Command(BaseCommand):
         print('Загрузка информации из csv файлов в базу данных.')
 
         for row in DictReader(
-            open('static/data/category.csv', encoding='utf-8')
+            open('static/data/category.csv', encoding='utf-8'),
         ):
             category = Category(
                 name=row['name'],
@@ -48,7 +48,7 @@ class Command(BaseCommand):
             genre.save()
 
         for row in DictReader(
-            open('static/data/titles.csv', encoding='utf-8')
+            open('static/data/titles.csv', encoding='utf-8'),
         ):
             category = Category.objects.get(
                 id=row['category'],

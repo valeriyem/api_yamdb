@@ -14,5 +14,5 @@ class DestroyCreateListMixins(
 
     permission_classes = (IsAdminOrSuperUser,)
     filter_backends = (filters.SearchFilter,)
-    # search_fields = ('name',)
-    # lookup_field = 'slug'
+    search_fields = ('name',)
+    lookup_field = 'slug'

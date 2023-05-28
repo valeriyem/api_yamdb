@@ -10,9 +10,9 @@ class User(AbstractUser):
     MODERATOR = 'moderator'
     USER = 'user'
     ROLES = [
-        (ADMIN, 'Администратор'),
-        (MODERATOR, 'Модератор'),
-        (USER, 'Пользователь'),
+        (ADMIN, 'admin'),
+        (MODERATOR, 'moderator'),
+        (USER, 'user'),
     ]
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
@@ -27,12 +27,16 @@ class User(AbstractUser):
         validators=[UsernameValidator(), username_not_me],
     )
     first_name = models.CharField(
-        verbose_name='Имя', max_length=settings.LIMIT_USERNAME, blank=True,
+        'Имя', max_length=settings.LIMIT_USERNAME, blank=True,
     )
     last_name = models.CharField(
-        verbose_name='Фамилия', max_length=settings.LIMIT_USERNAME, blank=True,
+        'Фамилия', max_length=settings.LIMIT_USERNAME, blank=True,
     )
-    bio = models.TextField(verbose_name='О себе', null=True, blank=True)
+    bio = models.TextField(
+        verbose_name='О себе',
+        null=True,
+        blank=True,
+    )
     role = models.CharField(
         verbose_name='Роль',
         max_length=settings.LIMIT_ROLE,
