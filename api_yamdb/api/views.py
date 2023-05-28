@@ -140,7 +140,6 @@ class CategoryViewSet(DestroyCreateListMixins):
 
 class GenreViewSet(DestroyCreateListMixins):
     """Вьюсет для обработки жанров для произведений."""
-
     permission_classes = [
         IsAdminOrReadOnly,
     ]
@@ -158,7 +157,6 @@ class GenreViewSet(DestroyCreateListMixins):
 
 class ReviewViewSet(ModelViewSet):
     """Вьюсет для объектов модели Review"""
-
     permission_classes = (IsStaffOrAuthorOrReadOnly,)
     serializer_class = ReviewSerializer
 
@@ -176,7 +174,6 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     """Вьюсет для объектов модели Comment."""
-
     permission_classes = (IsStaffOrAuthorOrReadOnly,)
     serializer_class = CommentSerializer
 

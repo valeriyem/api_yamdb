@@ -8,7 +8,6 @@ from .validators import year_validator
 
 class Title(models.Model):
     """Модель для создания произведений."""
-
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -63,7 +62,6 @@ class GenreTitle(models.Model):
 
 class Category(models.Model):
     """Модель для создания категорий к произведениям."""
-
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -84,7 +82,6 @@ class Category(models.Model):
 
 class Genre(models.Model):
     """Модель для создания жанров к произведениям."""
-
     name = models.CharField(
         max_length=256,
         verbose_name='Название',
@@ -105,7 +102,6 @@ class Genre(models.Model):
 
 class Review(models.Model):
     """Модель для создания отзывов."""
-
     text = models.TextField(verbose_name='текст')
     author = models.ForeignKey(
         User,
@@ -144,7 +140,6 @@ class Review(models.Model):
 
 class Comment(models.Model):
     """Модель для создания комментариев."""
-
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

@@ -8,7 +8,6 @@ from users.models import User
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """Базовая сериализация данных пользователя."""
-
     username = serializers.RegexField(
         max_length=settings.LIMIT_USERNAME,
         regex=r'^[\w.@+-]+\Z',
@@ -45,7 +44,6 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Сериализация запросов на регистрацию."""
-
     username = serializers.RegexField(
         max_length=settings.LIMIT_USERNAME,
         regex=r'^[\w.@+-]+\Z',
@@ -85,7 +83,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 class TokenSerializer(serializers.Serializer):
     """Сериализация токена."""
-
     username = serializers.RegexField(
         max_length=settings.LIMIT_USERNAME,
         regex=r'^[\w.@+-]+\Z',
@@ -103,7 +100,6 @@ class TokenSerializer(serializers.Serializer):
 
 class UserSerializer(BaseUserSerializer):
     """Сериализация данных пользователя."""
-
     def validate(self, data):
         data = super().validate(data)
         # Добавить дополнительную валидацию, если необходимо
@@ -112,14 +108,12 @@ class UserSerializer(BaseUserSerializer):
 
 class UserEditSerializer(BaseUserSerializer):
     """Сериализация редактирования данных пользователя."""
-
     class Meta(BaseUserSerializer.Meta):
         read_only_fields = ('role',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
     """Сериализация модели категорий к произведениям."""
-
     class Meta:
         model = Category
         fields = [
@@ -131,7 +125,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализация модели жанров к произведениям."""
-
     class Meta:
         model = Genre
         fields = [
@@ -143,7 +136,6 @@ class GenreSerializer(serializers.ModelSerializer):
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализация модели произведений."""
-
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         many=True,
@@ -161,7 +153,6 @@ class TitleSerializer(serializers.ModelSerializer):
 
 class ReadOnlyTitleSerializer(serializers.ModelSerializer):
     """Сериализация модели произведений с правами только для чтения."""
-
     rating = serializers.IntegerField(
         source='reviews__score__avg',
         read_only=True,
@@ -184,7 +175,6 @@ class ReadOnlyTitleSerializer(serializers.ModelSerializer):
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализация отзывов к произведениям."""
-
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
@@ -210,7 +200,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализация комментариев к отзывам."""
-
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
