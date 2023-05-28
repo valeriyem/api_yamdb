@@ -1,7 +1,6 @@
 from csv import DictReader
 
 from django.core.management import BaseCommand
-
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 from users.models import User
 
@@ -15,12 +14,9 @@ ALREDY_LOADED_ERROR_MESSAGE = """
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-
         print('Загрузка информации из csv файлов в базу данных.')
 
-        for row in DictReader(
-                open('static/data/users.csv', encoding='utf-8')
-        ):
+        for row in DictReader(open('static/data/users.csv', encoding='utf-8')):
             users = User(
                 id=row['id'],
                 username=row['username'],
@@ -33,7 +29,7 @@ class Command(BaseCommand):
             users.save()
 
         for row in DictReader(
-                open('static/data/category.csv', encoding='utf-8')
+            open('static/data/category.csv', encoding='utf-8'),
         ):
             category = Category(
                 name=row['name'],
@@ -41,9 +37,7 @@ class Command(BaseCommand):
             )
             category.save()
 
-        for row in DictReader(
-                open('static/data/genre.csv', encoding='utf-8')
-        ):
+        for row in DictReader(open('static/data/genre.csv', encoding='utf-8')):
             genre = Genre(
                 name=row['name'],
                 slug=row['slug'],
@@ -51,7 +45,7 @@ class Command(BaseCommand):
             genre.save()
 
         for row in DictReader(
-                open('static/data/titles.csv', encoding='utf-8')
+            open('static/data/titles.csv', encoding='utf-8'),
         ):
             category = Category.objects.get(
                 id=row['category'],
@@ -64,7 +58,7 @@ class Command(BaseCommand):
             title.save()
 
         for row in DictReader(
-                open('static/data/genre_title.csv', encoding='utf-8')
+            open('static/data/genre_title.csv', encoding='utf-8')
         ):
             title_id = Title.objects.get(id=row['title_id'])
             genre_id = Genre.objects.get(id=row['genre_id'])
@@ -76,7 +70,7 @@ class Command(BaseCommand):
             genre_title.save()
 
         for row in DictReader(
-                open('static/data/review.csv', encoding='utf-8')
+            open('static/data/review.csv', encoding='utf-8'),
         ):
             author_id = User.objects.get(id=row['author'])
 
@@ -90,7 +84,7 @@ class Command(BaseCommand):
             review.save()
 
         for row in DictReader(
-                open('static/data/comments.csv', encoding='utf-8')
+            open('static/data/comments.csv', encoding='utf-8'),
         ):
             author_id = User.objects.get(id=row['author'])
             review_id = Review.objects.get(id=row['review_id'])
