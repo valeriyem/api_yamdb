@@ -1,11 +1,48 @@
 from django.conf import settings
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+
+
+class BaseUserSerializer(serializers.ModelSerializer):
+    """Базовая сериализация данных пользователя."""
+    username = serializers.RegexField(
+        max_length=settings.LIMIT_USERNAME,
+        regex=r'^[\w.@+-]+\Z',
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+    email = serializers.EmailField(
+        max_length=settings.LIMIT_EMAIL,
+        validators=[UniqueValidator(queryset=User.objects.all())],
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
+        )
+
+    def validate_empty(self, data):
+        username = data.get('username')
+        email = data.get('email')
+        if not username:
+            raise serializers.ValidationError(
+                'Имя пользователя не может быть пустым',
+            )
+        if not email:
+            raise serializers.ValidationError('Email не может быть пустым')
+        return data
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -29,26 +66,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
         fields = ('username', 'email')
         model = User
 
-    def validate_empty(self, data):
-        username = data.get('username')
-        email = data.get('email')
-        if not username:
-            raise serializers.ValidationError(
-                'Имя пользователя не может быть пустым',
-            )
-        if not email:
-            raise serializers.ValidationError('Email не может быть пустым')
-        return data
-
     def validate(self, validated_data):
         username = validated_data['username']
         email = validated_data['email']
-        try:
-            user, _ = User.objects.get_or_create(
-                username=username, email=email,
-            )
-        except IntegrityError:
-            raise serializers.ValidationError('Это имя или email уже занято')
+
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError('Это имя пользователя уже занято')
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError('Этот email уже занят')
+
         return validated_data
 
 
@@ -68,65 +94,17 @@ class TokenSerializer(serializers.Serializer):
         model = User
 
 
-class UserSerializer(serializers.ModelSerializer):
-    """Сериалилзация данных пользователя."""
-    username = serializers.RegexField(
-        max_length=settings.LIMIT_USERNAME,
-        regex=r'^[\w.@+-]+\Z',
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
-    email = serializers.EmailField(
-        max_length=settings.LIMIT_EMAIL,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
-
-    class Meta:
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role',
-        )
-        model = User
-
-    def validate_empty(self, data):
-        username = data.get('username')
-        email = data.get('email')
-        if not username:
-            raise serializers.ValidationError(
-                'Имя пользователя не может быть пустым',
-            )
-        if not email:
-            raise serializers.ValidationError('Email не может быть пустым')
+class UserSerializer(BaseUserSerializer):
+    """Сериализация данных пользователя."""
+    def validate(self, data):
+        data = super().validate(data)
+        # Добавить дополнительную валидацию, если необходимо
         return data
 
 
-class UserEditSerializer(serializers.ModelSerializer):
+class UserEditSerializer(BaseUserSerializer):
     """Сериализация редактирования данных пользователя."""
-    username = serializers.RegexField(
-        max_length=settings.LIMIT_USERNAME,
-        regex=r'^[\w.@+-]+\Z',
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
-    email = serializers.EmailField(
-        max_length=settings.LIMIT_EMAIL,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
-
-    class Meta:
-        fields = (
-            'username',
-            'email',
-            'first_name',
-            'last_name',
-            'bio',
-            'role',
-        )
-        model = User
+    class Meta(BaseUserSerializer.Meta):
         read_only_fields = ('role',)
 
 
